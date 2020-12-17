@@ -1,0 +1,100 @@
+.wrapper{
+ display: flex;
+ flex-direction: column;
+}
+
+.container{
+  display: flex;
+  align-items: flex-end;
+}
+
+svg{
+ margin: 0 1.5rem;
+ padding-top: 0.5rem;
+}
+
+rect{
+  fill: var(--primaryText);
+}
+
+/* The Title */
+section {
+  font-family: 'Raleway', sans-serif;
+  font-weight: bold;
+  font-size: 4rem;
+  line-height: 110%;
+  color: var(--primaryText);
+}
+
+.text {
+  margin: 0;
+  line-height: 0.55;
+}
+
+span {
+  display: inline-block;
+  width: 20px;
+}
+
+.stack {
+  display: block;
+}
+
+@keyframes bounce {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(0, -10px, 0);
+  }
+}
+
+.bouncing {
+  animation: bounce 0.4s;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+  font-family: "Times New Roman", Times, serif;
+  color: var(--primaryTheme)
+}
+
+/* The Overlay (background) */
+nav {
+  height: 100%;
+  width: 0;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  background-color: rgba(0,0,0, 0.9);
+  overflow-x: hidden;
+  transition: 0.5s;
+}
+
+/* Position the content inside the overlay */
+.overlay-content {
+  position: relative;
+  top: 25%;
+  width: 100%;
+  text-align: center;
+  margin-top: 30px;
+}
+
+nav a {
+  padding: 8px;
+  text-decoration: none;
+  font-size: 36px;
+  color: var(--primaryText);
+  display: block;
+  transition: 0.3s;
+}
+
+nav a:hover, nav a:focus {
+  color: #f1f1f1;
+}
+
+nav .closebtn {
+  position: absolute;
+  top: 20px;
+  right: 45px;
+  font-size: 60px;
+}

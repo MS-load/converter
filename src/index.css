@@ -1,0 +1,56 @@
+@import url('https://fonts.googleapis.com/css2?family=Raleway:wght@800&display=swap');
+html.color-theme-in-transition, html.color-theme-in-transition *, html.color-theme-in-transition *:before, html.color-theme-in-transition *:after {
+  transition: all 750ms !important;
+  transition-delay: 0 !important;
+}
+
+html {
+  --primaryTheme: #25be82;
+  --primaryBg: #DBD5B5;
+  --primaryBgSize: contain;
+  --primaryText: #40798C;
+  --secondaryText: #fff;
+}
+
+html[data-theme="false"] {
+  /* global colors */
+  --primaryTheme: #25be82;
+  --primaryBg: #1a1a1d;
+  --primaryBgSize: contain;
+  --primaryText: #3dbbd2;
+  --secondaryText: #1a1a1d;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Raleway', sans-serif;
+}
+
+html, body, body>div {
+  margin: 0;
+  height: 100%;
+  display: flex;
+}
+
+body {
+  background: url(./assets/blob2.png) no-repeat bottom right fixed, var(--primaryBg);
+  background-size: cover;
+  color: var(--primaryText);
+}
+
+input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+
+input {
+  border: 1px solid var(--primaryText);
+  background: var(--primaryText);
+  color: var(--secondaryText);
+}
+
+select {
+  background: var(--primaryText);
+  color: var(--secondaryText);
+}
