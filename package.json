@@ -20,8 +20,7 @@
     "react-router": "^2.8.1",
     "react-router-dom": "^5.1.2",
     "react-scripts": "3.4.0",
-    "typescript": "^3.7.5",
-    "yup": "^0.28.3"
+    "typescript": "^3.7.5"
   },
   "scripts": {
     "start": "react-scripts start",
