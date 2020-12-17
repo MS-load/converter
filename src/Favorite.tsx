@@ -7,7 +7,7 @@ interface Props {
 }
 
 interface State {
-    list:  { fromCurrency: string, toCurrency: string, display: string}[]
+    list: { fromCurrency: string, toCurrency: string, display: string }[]
 }
 export default class Favorite extends React.Component<Props, State>{
     constructor(props: Props) {
@@ -18,31 +18,44 @@ export default class Favorite extends React.Component<Props, State>{
     }
 
     addItem = (event: { preventDefault: () => void; }) => {
+        event.preventDefault()
+
         let favList = this.state.list
+
         let favGroup: {
             fromCurrency: string
             toCurrency: string
             display: string
         }
+
         let oldFav = localStorage.getItem('favList')
+
         if (oldFav) {
             favList = (JSON.parse(oldFav))
         }
-        if (this.props.currencyTranslations !== null && favList.length <= 2) {
-            event.preventDefault()
 
-            if (favList.some(item => item.display === (`${this.props.currencyTranslations[0].fromCurrency} vs ${this.props.currencyTranslations[0].toCurrency}`))) { }
-            else {
-                favGroup = {
-                    fromCurrency: `${this.props.currencyTranslations[0].fromCurrency}`,
-                    toCurrency: this.props.currencyTranslations[0].toCurrency,
-                    display: `${this.props.currencyTranslations[0].fromCurrency} vs ${this.props.currencyTranslations[0].toCurrency}`
-                }
-                favList.push(favGroup)
-                localStorage.setItem('favList', JSON.stringify(favList))
+
+        const favExists = favList.some(
+            item => item.display === (`${this.props.currencyTranslations[0].fromCurrency}
+             vs 
+             ${this.props.currencyTranslations[0].toCurrency}`))
+
+        if (this.props.currencyTranslations !== null
+            && favList.length <= 2
+            && !favExists) {
+
+            favGroup = {
+                fromCurrency: `${this.props.currencyTranslations[0].fromCurrency}`,
+                toCurrency: this.props.currencyTranslations[0].toCurrency,
+                display: `${this.props.currencyTranslations[0].fromCurrency} 
+                vs 
+                ${this.props.currencyTranslations[0].toCurrency}`
             }
+            favList.push(favGroup)
+            localStorage.setItem('favList', JSON.stringify(favList))
+
         }
-        this.setState({
+        return this.setState({
             list: favList
         })
     }
@@ -57,7 +70,6 @@ export default class Favorite extends React.Component<Props, State>{
             this.setState({
                 list: parsedList,
             })
-            console.log(this.state.list)
         }
     }
 
@@ -70,7 +82,6 @@ export default class Favorite extends React.Component<Props, State>{
     }
 
     render() {
-        console.log(this.state.list)
         return (
             <div style={wrapper}>
 

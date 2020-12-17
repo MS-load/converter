@@ -9,18 +9,22 @@ interface Props {
     amount: number
 }
 
-export default function CurrencyRow(props: Props) {
-    return (
-        <div style={container}>
-            <select style={dropDown} value={props.selectedCurrency} onChange={props.onChangeCurrency} name={props.name} id="">
-                {props.currencyOptions.map(item => (
-                    <option key={item} value={item}>{item}</option>
-                ))}
+export default class CurrencyRow extends React.Component<Props> {
+    render() {
+        return (
+            <div style={container}>
+                <select style={dropDown} value={this.props.selectedCurrency} onChange={this.props.onChangeCurrency}
+                        name={this.props.name}>
+                    {this.props.currencyOptions.map(item => (
+                        <option key={item} value={item}>{item}</option>
+                    ))}
 
-            </select>
-            <input type="number" style={inputStyle} name={props.nameInput} value={props.amount} onChange={props.onChangeAmount} id="" />
-        </div>
-    )
+                </select>
+                <input type="number" style={inputStyle} name={this.props.nameInput} value={this.props.amount}
+                       onChange={this.props.onChangeAmount}/>
+            </div>
+        )
+    }
 }
 
 const container: React.CSSProperties = {

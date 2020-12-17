@@ -6,10 +6,12 @@ interface Props{
     imageWidth: string
 }
 
-export default function Image(props: Props) {
-    return (
-       <img style={{width: props.imageWidth}} src={props.imageSrc} alt=""/>
-    )
+export default class Image extends React.Component<Props> {
+    render() {
+        return (
+            <img style={{width: this.props.imageWidth}} src={this.props.imageSrc} alt=""/>
+        )
+    }
 }
 
 

@@ -4,12 +4,14 @@ interface Props {
     flagImage: string
 }
 
-export default function Flag(props: Props) {
-    return (
-        <div style={container}>
-            <img style={flagStyle} src={props.flagImage} alt='' />
-        </div>
-    )
+export default class Flag extends React.Component<Props> {
+    render() {
+        return (
+            <div style={container}>
+                <img style={flagStyle} src={this.props.flagImage} alt=''/>
+            </div>
+        )
+    }
 }
 
 const container: React.CSSProperties = {

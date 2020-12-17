@@ -1,7 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Raleway:wght@800&display=swap');
 html.color-theme-in-transition, html.color-theme-in-transition *, html.color-theme-in-transition *:before, html.color-theme-in-transition *:after {
   transition: all 750ms !important;
-  transition-delay: 0 !important;
 }
 
 html {

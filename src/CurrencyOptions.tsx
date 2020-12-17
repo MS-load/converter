@@ -47,21 +47,20 @@ export default class CurrencyOptions extends React.Component<Props, State> {
                 fetch(`https://api.exchangeratesapi.io/latest`),
                 fetch('https://restcountries.eu/rest/v2/all?fields=name;currencies;flag')])
             const dataArray = await Promise.all(responses.map((res) => res.json()))
-            const defaultCurrency = await Object.keys(dataArray[0].rates)[0]
+            const defaultCurrency = Object.keys(dataArray[0].rates)[0]
 
-            await this.setState({
+            this.setState({
                 isLoaded: true,
                 fromCurrency: dataArray[0].base,
                 toCurrency: defaultCurrency,
                 options: [...Object.keys(dataArray[0].rates), dataArray[0].base],
                 exchangeRate: (dataArray[0].rates[defaultCurrency]),
+            }, () => {
+                this.setState({
+                    fromFlag: this.currency2flag(this.state.fromCurrency, dataArray[1]),
+                    toFlag: this.currency2flag(this.state.toCurrency, dataArray[1])
+                })
             })
-
-            await this.setState({
-                fromFlag: this.currency2flag(this.state.fromCurrency, dataArray[1]),
-                toFlag: this.currency2flag(this.state.toCurrency, dataArray[1])
-            })
-
         }
         catch (error) {
             this.setState({
@@ -73,13 +72,18 @@ export default class CurrencyOptions extends React.Component<Props, State> {
     }
 
     currency2flag(currency: string, dataSet: any[]) {
+        if (!currency || !dataSet) {
+            return
+        }
+
         let flag;
+
         switch (currency) {
             case 'AUD':
                 flag = dataSet.find((element: { name: string }) => element.name === 'Australia').flag
                 break;
             case 'USD':
-                flag = (dataSet.find((element: { name: string }) => element.name === 'United States of America')).flag
+                flag = dataSet.find((element: { name: string }) => element.name === 'United States of America').flag
                 break;
             case 'CHF':
                 flag = dataSet.find((element: { name: string }) => element.name === 'Switzerland').flag
@@ -106,7 +110,7 @@ export default class CurrencyOptions extends React.Component<Props, State> {
 
     async update(fromCurrency: string, toCurrency: string) {
         if (fromCurrency === 'EUR' && toCurrency === 'EUR') {
-            this.setState({
+            return this.setState({
                 exchangeRate: 1,
                 fromFlag: EUR,
                 toFlag: EUR
@@ -117,19 +121,7 @@ export default class CurrencyOptions extends React.Component<Props, State> {
                 const responses = await Promise.all([
                     fetch(`https://api.exchangeratesapi.io/latest?base=${fromCurrency}&symbols=${toCurrency}`),
                     fetch('https://restcountries.eu/rest/v2/all?fields=name;currencies;flag')])
-                const dataArray = await Promise.all(responses.map((res) => res.json()))
-                if (fromCurrency === 'EUR' && toCurrency === 'EUR') {
-                    this.setState({
-                        exchangeRate: 1,
-                        fromFlag: this.currency2flag(fromCurrency, dataArray[1]),
-                        toFlag: this.currency2flag(toCurrency, dataArray[1])
-                    })
-                }
-                this.setState({
-                    exchangeRate: (dataArray[0].rates[toCurrency]),
-                    fromFlag: this.currency2flag(fromCurrency, dataArray[1]),
-                    toFlag: this.currency2flag(toCurrency, dataArray[1])
-                })
+                return await Promise.all(responses.map((res) => res.json()))
             } catch (error) {
                 this.setState({
                     isLoaded: true,
@@ -141,11 +133,18 @@ export default class CurrencyOptions extends React.Component<Props, State> {
     }
 
     componentDidUpdate(prevProps: Props, prevState: State) {
-        console.log('UPDATE')
-        if (this.state.toCurrency !== prevState.toCurrency || this.state.fromCurrency !== prevState.fromCurrency) {
-            this.update(this.state.fromCurrency, this.state.toCurrency)
+        if (this.state.toCurrency !== prevState.toCurrency ||
+            this.state.fromCurrency !== prevState.fromCurrency) {
+            this.update(this.state.fromCurrency, this.state.toCurrency).then(response => {
+                if (!response) { return }
+                const dataArray: any[] = response || []
+                return this.setState({
+                    exchangeRate: (dataArray[0].rates[this.state.toCurrency]),
+                    fromFlag: this.currency2flag(this.state.fromCurrency, dataArray[1]),
+                    toFlag: this.currency2flag(this.state.toCurrency, dataArray[1])
+                })
+            })
         }
-
     }
 
     changeCurrency = (event: { target: { name: string; value: string } }) => {
@@ -177,8 +176,6 @@ export default class CurrencyOptions extends React.Component<Props, State> {
             fromCurrency: event.target.getAttribute('data-fromcurrency'),
             toCurrency: event.target.getAttribute('data-tocurrency')
         })
-        
-        
     }
 
     changeDisplayPage = (value: string) => {
@@ -196,22 +193,31 @@ export default class CurrencyOptions extends React.Component<Props, State> {
     }
 
     render() {
-        if (this.state.error) {
+        const { error, isLoaded,
+            amountInFromCurrency, options,
+            amount, exchangeRate,
+            fromCurrency, fromFlag,
+            toCurrency, toFlag
+        } = this.state
+
+        const { displayPage } = this.props
+
+        if (error) {
             return <div>Error</div>
-        } else if (!this.state.isLoaded) {
+        } else if (!isLoaded) {
             return <div>Loading...</div>
         }
 
         else {
             let fromAmount: number, toAmount: number
-            if (this.state.amountInFromCurrency) {
-                fromAmount = this.state.amount
-                toAmount = this.state.amount * this.state.exchangeRate
+            if (amountInFromCurrency) {
+                fromAmount = amount
+                toAmount = amount * exchangeRate
             }
 
             else {
-                toAmount = this.state.amount
-                fromAmount = this.state.amount / this.state.exchangeRate
+                toAmount = amount
+                fromAmount = amount / exchangeRate
             }
             return (
                 <div style={mainWrapper}>
@@ -220,31 +226,34 @@ export default class CurrencyOptions extends React.Component<Props, State> {
                             <CurrencyRow
                                 name={'from'}
                                 nameInput={'fromInput'}
-                                currencyOptions={(this.state.options)}
-                                selectedCurrency={this.state.fromCurrency}
+                                currencyOptions={(options)}
+                                selectedCurrency={fromCurrency}
                                 onChangeCurrency={(event) => this.changeCurrency(event)}
                                 onChangeAmount={(event) => this.changeAmount(event)}
                                 amount={fromAmount}
                             />
-                            <Flag flagImage={this.state.fromFlag} />
+                            <Flag flagImage={fromFlag} />
                         </div>
-                        <SyncIcon style={{ fontSize: 50 }} onClick={(event: { preventDefault: () => void }) => this.handleClick(event)} />
+                        <SyncIcon
+                            style={{ fontSize: 50 }}
+                            onClick={(event: { preventDefault: () => void }) => this.handleClick(event)}
+                        />
                         <div style={groupItem}>
                             <CurrencyRow
                                 name={'to'}
                                 nameInput={'toInput'}
-                                currencyOptions={(this.state.options)}
-                                selectedCurrency={this.state.toCurrency}
+                                currencyOptions={(options)}
+                                selectedCurrency={toCurrency}
                                 onChangeCurrency={(event) => this.changeCurrency(event)}
                                 onChangeAmount={(event) => this.changeAmount(event)}
                                 amount={toAmount}
                             />
-                            <Flag flagImage={this.state.toFlag} />
+                            <Flag flagImage={toFlag} />
                         </div>
 
                     </div>
                     <div style={mainGroupItem}>
-                        {this.changeDisplayPage(this.props.displayPage)}
+                        {this.changeDisplayPage(displayPage)}
                     </div>
                 </div>)
         }
